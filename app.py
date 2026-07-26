@@ -1,4 +1,3 @@
-
 import streamlit as st
 import tensorflow as tf
 import numpy as np
@@ -20,12 +19,20 @@ st.title('🏆 Analisis Peluang Juara')
 
 if model:
     team = st.text_input('Nama Tim', 'Brazil')
+    continent = st.selectbox('Benua', ['South America', 'Europe', 'North America', 'Asia', 'Africa', 'Oceania'])
+    
     if st.button('Analisis'):
-        # Menggunakan input minimal untuk tes
-        # Catatan: Pastikan urutan fitur ini sama dengan saat training
         try:
-            dummy_input = {k: np.array([0]) if 'market' not in k else np.array([0.0]) for k in model.input_names}
-            dummy_input['team'] = np.array([team])
+            # Menyiapkan dummy input untuk seluruh 20 fitur model
+            dummy_input = {}
+            for name in model.input_names:
+                if name == 'team':
+                    dummy_input[name] = np.array([[team]])
+                elif name == 'continent':
+                    dummy_input[name] = np.array([[continent]])
+                else:
+                    # Nilai numerik default untuk fitur lainnya
+                    dummy_input[name] = np.array([[0.0]], dtype=np.float32)
             
             pred = model.predict(dummy_input)
             prob = float(pred[0][0])
